@@ -9,3 +9,4 @@ silver/
 
 # Ignore Python bytecode files
 __pycache__/
+.pytest_cache/
