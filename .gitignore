@@ -2,11 +2,11 @@
 .env
 
 # Ignore directories that don't need to be pushed to GitHub
-bronze/
-data/
-gold/
-silver/
+venv/
 
 # Ignore Python bytecode files
 __pycache__/
 .pytest_cache/
+
+# Ignore
+.DS_Store
