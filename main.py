@@ -1,11 +1,11 @@
 import os
 from dotenv import load_dotenv
 from pyspark.sql import SparkSession
-from data_ingestion import DataIngestion
-from data_transformation import DataTransformation
-from data_validation import DataValidation
-from data_deduplication import DataDeduplication
-from data_aggregation import DataAggregation
+from pipeline_engine.data_ingestion import DataIngestion
+from pipeline_engine.data_transformation import DataTransformation
+from pipeline_engine.data_validation import DataValidation
+from pipeline_engine.data_deduplication import DataDeduplication
+from pipeline_engine.data_aggregation import DataAggregation
 
 # Initialize Spark session
 spark = SparkSession.builder \

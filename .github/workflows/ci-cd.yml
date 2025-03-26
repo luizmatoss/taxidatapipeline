@@ -1,19 +1,17 @@
-name: Python CI
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Set environment variables
+        run: |
+          # Define the correct paths relative to the GitHub runner's workspace
+          echo "ROOT_DIR=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+          echo "BRONZE_PATH=${GITHUB_WORKSPACE}/data/bronze" >> $GITHUB_ENV
+          echo "SILVER_PATH=${GITHUB_WORKSPACE}/data/silver" >> $GITHUB_ENV
+          echo "GOLD_PATH=${GITHUB_WORKSPACE}/data/gold" >> $GITHUB_ENV
 
       - name: Set up Python
         uses: actions/setup-python@v4
