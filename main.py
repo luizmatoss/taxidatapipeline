@@ -23,9 +23,10 @@ def run_pipeline():
     spark = create_spark_session()
 
     load_dotenv()
-    bronze_path = os.getenv("BRONZE_PATH")
-    silver_path = os.getenv("SILVER_PATH")
-    gold_path = os.getenv("GOLD_PATH")
+    project_root = os.path.dirname(os.path.abspath(__file__))
+    bronze_path = os.getenv("BRONZE_PATH", os.path.join(project_root, "data", "bronze"))
+    silver_path = os.getenv("SILVER_PATH", os.path.join(project_root, "data", "silver"))
+    gold_path = os.getenv("GOLD_PATH", os.path.join(project_root, "data", "gold"))
 
     ingestion = DataIngestion(spark, bronze_path)
     transformation = DataTransformation(spark, silver_path)
