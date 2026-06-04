@@ -13,8 +13,12 @@ def test_file_paths(tmp_path, monkeypatch):
     silver_path.mkdir()
     gold_path.mkdir()
 
-    (bronze_path / "green_tripdata_2021_01.csv").write_text("header\n", encoding="utf-8")
-    (bronze_path / "yellow_tripdata_2021_01.csv").write_text("header\n", encoding="utf-8")
+    (bronze_path / "green_tripdata_2021_01.csv").write_text(
+        "header\n", encoding="utf-8"
+    )
+    (bronze_path / "yellow_tripdata_2021_01.csv").write_text(
+        "header\n", encoding="utf-8"
+    )
 
     monkeypatch.setenv("BRONZE_PATH", str(bronze_path))
     monkeypatch.setenv("SILVER_PATH", str(silver_path))
@@ -24,8 +28,12 @@ def test_file_paths(tmp_path, monkeypatch):
     assert os.path.exists(os.getenv("SILVER_PATH"))
     assert os.path.exists(os.getenv("GOLD_PATH"))
 
-    green_data_path = os.path.join(os.getenv("BRONZE_PATH"), "green_tripdata_2021_01.csv")
-    yellow_data_path = os.path.join(os.getenv("BRONZE_PATH"), "yellow_tripdata_2021_01.csv")
+    green_data_path = os.path.join(
+        os.getenv("BRONZE_PATH"), "green_tripdata_2021_01.csv"
+    )
+    yellow_data_path = os.path.join(
+        os.getenv("BRONZE_PATH"), "yellow_tripdata_2021_01.csv"
+    )
 
     assert os.path.exists(green_data_path)
     assert os.path.exists(yellow_data_path)
@@ -47,7 +55,9 @@ def test_import_data_reads_green_and_yellow(spark, tmp_path):
     )
 
     (bronze_path / "green_tripdata_2021_01.csv").write_text(green_csv, encoding="utf-8")
-    (bronze_path / "yellow_tripdata_2021_01.csv").write_text(yellow_csv, encoding="utf-8")
+    (bronze_path / "yellow_tripdata_2021_01.csv").write_text(
+        yellow_csv, encoding="utf-8"
+    )
 
     ingestion = DataIngestion(spark, str(bronze_path))
     green_df, yellow_df = ingestion.import_data()

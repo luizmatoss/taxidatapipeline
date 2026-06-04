@@ -1,6 +1,7 @@
 from pyspark.sql.functions import when
 import logging
 
+
 class DataValidation:
     def __init__(self, spark, silver_path):
         self.spark = spark
@@ -15,10 +16,15 @@ class DataValidation:
             )
             valid_data_df = imputed_df.filter(imputed_df["PassengerCount"] > 0)
             invalid_data_df = imputed_df.filter(
-                (imputed_df["PassengerCount"] <= 0) | imputed_df["PassengerCount"].isNull()
+                (imputed_df["PassengerCount"] <= 0)
+                | imputed_df["PassengerCount"].isNull()
             )
-            valid_data_df.write.mode("overwrite").parquet(f"{self.silver_path}/valid_{dataset_name}_data.parquet")
-            invalid_data_df.write.mode("overwrite").csv(f"{self.silver_path}/invalid_{dataset_name}_data.csv")
+            valid_data_df.write.mode("overwrite").parquet(
+                f"{self.silver_path}/valid_{dataset_name}_data.parquet"
+            )
+            invalid_data_df.write.mode("overwrite").csv(
+                f"{self.silver_path}/invalid_{dataset_name}_data.csv"
+            )
             return valid_data_df, invalid_data_df
         except Exception as e:
             self.logger.error(f"Error validating data: {e}")

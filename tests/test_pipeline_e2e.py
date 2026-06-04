@@ -24,7 +24,9 @@ def test_run_pipeline_writes_silver_and_gold_outputs(tmp_path, monkeypatch):
     )
 
     (bronze_path / "green_tripdata_2021_01.csv").write_text(green_csv, encoding="utf-8")
-    (bronze_path / "yellow_tripdata_2021_01.csv").write_text(yellow_csv, encoding="utf-8")
+    (bronze_path / "yellow_tripdata_2021_01.csv").write_text(
+        yellow_csv, encoding="utf-8"
+    )
 
     monkeypatch.setenv("BRONZE_PATH", str(bronze_path))
     monkeypatch.setenv("SILVER_PATH", str(silver_path))
@@ -42,15 +44,11 @@ def test_run_pipeline_writes_silver_and_gold_outputs(tmp_path, monkeypatch):
 
     valid_df = spark.read.parquet(str(silver_path / "valid_combined_data.parquet"))
     deduped_df = spark.read.parquet(str(silver_path / "deduped_combined_data.parquet"))
-    locations_df = (
-        spark
-        .read.option("header", "true")
-        .csv(str(gold_path / "locations_data.csv"))
+    locations_df = spark.read.option("header", "true").csv(
+        str(gold_path / "locations_data.csv")
     )
-    vendors_df = (
-        spark
-        .read.option("header", "true")
-        .csv(str(gold_path / "vendors_data.csv"))
+    vendors_df = spark.read.option("header", "true").csv(
+        str(gold_path / "vendors_data.csv")
     )
 
     assert valid_df.columns == [
@@ -69,7 +67,13 @@ def test_run_pipeline_writes_silver_and_gold_outputs(tmp_path, monkeypatch):
     assert deduped_df.count() == 2
 
     valid_rows = {
-        (row.VendorId, row.PickUpLocationId, row.DropOffLocationId, row.PassengerCount, row.TotalAmount)
+        (
+            row.VendorId,
+            row.PickUpLocationId,
+            row.DropOffLocationId,
+            row.PassengerCount,
+            row.TotalAmount,
+        )
         for row in valid_df.collect()
     }
     assert valid_rows == {
@@ -88,21 +92,45 @@ def test_run_pipeline_writes_silver_and_gold_outputs(tmp_path, monkeypatch):
     assert locations_df.count() == 2
 
     location_rows = {
-        (row.PickUpLocationId, row.DropOffLocationId): (float(row.TotalFare), float(row.TotalTips))
+        (row.PickUpLocationId, row.DropOffLocationId): (
+            float(row.TotalFare),
+            float(row.TotalTips),
+        )
         for row in locations_df.collect()
     }
     assert location_rows[("138", "239")] == (pytest.approx(20.0), pytest.approx(1.2))
     assert location_rows[("42", "43")] == (pytest.approx(15.0), pytest.approx(0.5))
 
-    assert vendors_df.columns == ["VendorId", "TotalFare", "TotalTips", "AvgFare", "AvgTip"]
+    assert vendors_df.columns == [
+        "VendorId",
+        "TotalFare",
+        "TotalTips",
+        "AvgFare",
+        "AvgTip",
+    ]
     assert vendors_df.count() == 2
 
     vendor_rows = {
-        row.VendorId: (float(row.TotalFare), float(row.TotalTips), float(row.AvgFare), float(row.AvgTip))
+        row.VendorId: (
+            float(row.TotalFare),
+            float(row.TotalTips),
+            float(row.AvgFare),
+            float(row.AvgTip),
+        )
         for row in vendors_df.collect()
     }
-    assert vendor_rows["1"] == (pytest.approx(20.0), pytest.approx(1.2), pytest.approx(20.0), pytest.approx(1.2))
-    assert vendor_rows["2"] == (pytest.approx(15.0), pytest.approx(0.5), pytest.approx(15.0), pytest.approx(0.5))
+    assert vendor_rows["1"] == (
+        pytest.approx(20.0),
+        pytest.approx(1.2),
+        pytest.approx(20.0),
+        pytest.approx(1.2),
+    )
+    assert vendor_rows["2"] == (
+        pytest.approx(15.0),
+        pytest.approx(0.5),
+        pytest.approx(15.0),
+        pytest.approx(0.5),
+    )
 
 
 def test_run_pipeline_writes_invalid_silver_contract(tmp_path, monkeypatch):
@@ -126,7 +154,9 @@ def test_run_pipeline_writes_invalid_silver_contract(tmp_path, monkeypatch):
     )
 
     (bronze_path / "green_tripdata_2021_01.csv").write_text(green_csv, encoding="utf-8")
-    (bronze_path / "yellow_tripdata_2021_01.csv").write_text(yellow_csv, encoding="utf-8")
+    (bronze_path / "yellow_tripdata_2021_01.csv").write_text(
+        yellow_csv, encoding="utf-8"
+    )
 
     monkeypatch.setenv("BRONZE_PATH", str(bronze_path))
     monkeypatch.setenv("SILVER_PATH", str(silver_path))

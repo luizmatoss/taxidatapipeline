@@ -2,6 +2,7 @@ import glob
 import logging
 import os
 
+
 class DataIngestion:
     def __init__(self, spark, bronze_path):
         self.spark = spark
@@ -9,16 +10,28 @@ class DataIngestion:
         self.logger = logging.getLogger("DataIngestionLogger")
 
     def _resolve_source_file(self, dataset_prefix):
-        expected_csv = os.path.join(self.bronze_path, f"{dataset_prefix}_tripdata_2021_01.csv")
-        expected_parquet = os.path.join(self.bronze_path, f"{dataset_prefix}_tripdata_2021_01.parquet")
+        expected_csv = os.path.join(
+            self.bronze_path, f"{dataset_prefix}_tripdata_2021_01.csv"
+        )
+        expected_parquet = os.path.join(
+            self.bronze_path, f"{dataset_prefix}_tripdata_2021_01.parquet"
+        )
 
         if os.path.exists(expected_csv):
             return expected_csv
         if os.path.exists(expected_parquet):
             return expected_parquet
 
-        csv_candidates = sorted(glob.glob(os.path.join(self.bronze_path, f"{dataset_prefix}_tripdata_*.csv")))
-        parquet_candidates = sorted(glob.glob(os.path.join(self.bronze_path, f"{dataset_prefix}_tripdata_*.parquet")))
+        csv_candidates = sorted(
+            glob.glob(
+                os.path.join(self.bronze_path, f"{dataset_prefix}_tripdata_*.csv")
+            )
+        )
+        parquet_candidates = sorted(
+            glob.glob(
+                os.path.join(self.bronze_path, f"{dataset_prefix}_tripdata_*.parquet")
+            )
+        )
 
         if parquet_candidates:
             return parquet_candidates[-1]
@@ -32,8 +45,7 @@ class DataIngestion:
             return self.spark.read.parquet(file_path)
 
         return (
-            self.spark.read
-            .option("header", "true")
+            self.spark.read.option("header", "true")
             .option("mode", "FAILFAST")
             .option("enforceSchema", "true")
             .csv(file_path)
