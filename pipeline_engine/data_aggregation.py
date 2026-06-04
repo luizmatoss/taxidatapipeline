@@ -1,4 +1,3 @@
-from pyspark.sql import functions as F
 from pyspark.sql.functions import col, sum, avg
 import logging
 
@@ -7,10 +6,6 @@ class DataAggregation:
         self.spark = spark
         self.gold_path = gold_path
         self.logger = logging.getLogger("DataAggregationLogger")
-        
-    # Initialize logger inside the class
-        logging.basicConfig(level=logging.INFO)
-        self.logger = logging.getLogger("TaxiDataPipelineLogger")
         
     def shape_data_to_gold(self, df):
         """

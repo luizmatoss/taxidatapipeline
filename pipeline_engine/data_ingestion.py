@@ -13,8 +13,20 @@ class DataIngestion:
             green_file_path = os.path.join(self.bronze_path, "green_tripdata_2021_01.csv")
             yellow_file_path = os.path.join(self.bronze_path, "yellow_tripdata_2021_01.csv")
 
-            green_df = self.spark.read.option("header", "true").csv(green_file_path)
-            yellow_df = self.spark.read.option("header", "true").csv(yellow_file_path)
+            green_df = (
+                self.spark.read
+                .option("header", "true")
+                .option("mode", "FAILFAST")
+                .option("enforceSchema", "true")
+                .csv(green_file_path)
+            )
+            yellow_df = (
+                self.spark.read
+                .option("header", "true")
+                .option("mode", "FAILFAST")
+                .option("enforceSchema", "true")
+                .csv(yellow_file_path)
+            )
 
             self.logger.info(f"Loaded Green dataset with {green_df.count()} records.")
             self.logger.info(f"Loaded Yellow dataset with {yellow_df.count()} records.")
