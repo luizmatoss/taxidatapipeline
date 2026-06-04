@@ -1,4 +1,5 @@
 import os
+import re
 import time
 from datetime import datetime, timedelta
 
@@ -39,6 +40,24 @@ ACR_PASSWORD = os.getenv("AZURE_REGISTRY_PASSWORD")
 
 POLL_INTERVAL_SECONDS = int(os.getenv("ACI_POLL_INTERVAL_SECONDS", "15"))
 POLL_TIMEOUT_SECONDS = int(os.getenv("ACI_POLL_TIMEOUT_SECONDS", "7200"))
+
+
+def _build_container_group_name(context) -> str:
+    """Build a unique and ACI-safe container group name per DAG run."""
+    run_id = context.get("run_id") or context.get("ts_nodash") or "manual"
+    normalized_run = re.sub(r"[^a-z0-9-]", "-", str(run_id).lower())
+    normalized_run = re.sub(r"-+", "-", normalized_run).strip("-")
+
+    name = (
+        f"{ACI_CONTAINER_GROUP_NAME}-{normalized_run}"
+        if normalized_run
+        else ACI_CONTAINER_GROUP_NAME
+    )
+    name = re.sub(r"[^a-z0-9-]", "-", name.lower())
+    name = re.sub(r"-+", "-", name).strip("-")
+
+    # Azure Container Group name must be <= 63 chars.
+    return name[:63]
 
 
 def _validate_required_env() -> None:
@@ -95,13 +114,15 @@ def submit_aci_container(**context) -> None:
         image_registry_credentials=image_registry_credentials,
     )
 
+    container_group_name = _build_container_group_name(context)
+
     client.container_groups.begin_create_or_update(
         resource_group_name=AZURE_RESOURCE_GROUP,
-        container_group_name=ACI_CONTAINER_GROUP_NAME,
+        container_group_name=container_group_name,
         container_group=group,
     ).result()
 
-    context["ti"].xcom_push(key="container_group_name", value=ACI_CONTAINER_GROUP_NAME)
+    context["ti"].xcom_push(key="container_group_name", value=container_group_name)
 
 
 def poll_aci_completion(**context) -> None:
